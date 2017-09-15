@@ -30,7 +30,7 @@ def naked_twins(values):
 def cross(A, B):
     "Cross product of elements in A and elements in B."
     return [s+t for s in A for t in B]
-# TODO: cross
+
 
 def grid_values(grid):
     """
@@ -42,8 +42,15 @@ def grid_values(grid):
             Keys: The boxes, e.g., 'A1'
             Values: The value in each box, e.g., '8'. If the box has no value, then the value will be '123456789'.
     """
-    # TODO: grid_values
-    pass
+    all_values = '123456789'
+    values = [] #New list to replace Grid
+    for i in grid:
+        if i == '.':
+            values.append(all_values)
+        elif i in all_values:
+            values.append(i)
+    return dict(zip(boxes, values))
+
 
 def display(values):
     """
@@ -51,17 +58,36 @@ def display(values):
     Args:
         values(dict): The sudoku in dictionary form
     """
-    pass
-    # TODO: display
+    width = 1+max(len(values[s]) for s in boxes)
+    line = '+'.join(['-'*(width*3)]*3)
+    for r in rows:
+        print(''.join(values[r+c].center(width)+('|' if c in '36' else '')
+                      for c in cols))
+        if r in 'CF': print(line)
+    return
 
 
 def eliminate(values):
-    pass
-    # TODO:  elimniate
+    solves_values = [box for box in values.keys() if len(values[box]) ==1]
+
+    for box in solved_values:
+        digit = values[box]
+        for peer in peers[box]
+            values[peer] = values[peer].replace(digit, '')
+    return values
+
 
 def only_choice(values):
-    pass
-    # TODO: only_choice
+    """
+
+    """
+    for unit in unitlist:
+        for digit in '123456789'
+            dplaces = [box for box in unit if digit in values[box]]
+            if len(dplace) == 1:
+                values[dplaces[0]] = digit
+    return values
+
 def reduce_puzzle(values):
     pass
     # TODO: reduce_puzzle
