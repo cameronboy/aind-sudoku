@@ -1,4 +1,33 @@
+
+
+# NEcessary OBjects
+
 assignments = []
+
+def cross(A, B):
+    "Cross product of elements in A and elements in B."
+    return [s+t for s in A for t in B]
+
+def get_unitlist(solving_diaganol=False):
+    if solving_diaganol:
+        return row_units + column_units + square_units + diag_units
+    else:
+        return row_units + column_units + square_units
+
+
+rows = 'ABCDEFGHI'
+cols = '123456789'
+
+boxes = cross(rows, cols)
+
+row_units = [cross(r, cols) for r in rows]
+column_units = [cross(rows, c) for c in cols]
+square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
+diag_units = [[rows[i] + cols[i] for i in range(9)], [rows[::-1][i] + cols[i] for i in range(9)]]
+unitlist = get_unitlist(solving_diaganol=True)
+units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
+peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
+
 
 def assign_value(values, box, value):
     """
@@ -23,35 +52,38 @@ def naked_twins(values):
     Returns:
         the values dictionary with the naked twins eliminated from peers.
     """
-    # TODO: Naked Twins
 
     #Getting the potential twins, those boxes wtih two values
-    candidates = [box for box in values.keys() if len(value[box]) == 2]
+    candidates = [box for box in values.keys() if len(values[box]) == 2]
 
     # from the candidates that have 2 values, run through each box
-    naked_twins = [[box1, box2] for box1 in potential_twins
+    naked_twins = [[box1, box2] for box1 in candidates
                         #and then that boxes' peers
                                 for box2 in peers[box1] \
                                 # and add that combination of B1,B2 if
                                 #the two boxes values are essentially equal!
                                 if set(values[box1]) == set(values[box2])]
 
-
+    #For the naked_twins, run through each twin's peers
+    #and remove the twin's values from that peer
     for i in range(len(naked_twins)):
+        #define our twins for easy reference
         box1 = naked_twins[i][0]
         box2 = naked_twins[i][1]
+        #Gather each twin's peers
         peers1 = set(peers[box1])
         peers2 = set(peers[box2])
         peers_int = peers1 & peers2
+        #Run through all the peers
         for peer_val in peers_int:
+            #by passing peers that are already solved
             if len(values[peer_val])>2:
+                #run through the values for that peer
                 for rm_val in values[box1]:
+                    #"reassign"/remove the values from that peer that are contained
+                    #in the twin
                     values = assign_value(values, peer_val, values[peer_val].replace(rm_val,''))
     return values
-
-def cross(A, B):
-    "Cross product of elements in A and elements in B."
-    return [s+t for s in A for t in B]
 
 
 def grid_values(grid):
@@ -94,12 +126,12 @@ def eliminate(values):
     When a box is already solved, i.e. only has one value, then we can and
     should remove that value from it's peers
     """
-    solves_values = [box for box in values.keys() if len(values[box]) ==1]
+    solved_values = [box for box in values.keys() if len(values[box]) ==1]
 
     for box in solved_values:
         digit = values[box]
         for peer in peers[box]:
-            values[peer] = values[peer].replace(digit, '')
+            values = assign_value(values, peer, values[peer].replace(digit,''))
     return values
 
 
@@ -111,7 +143,7 @@ def only_choice(values):
     for unit in unitlist:
         for digit in '123456789':
             dplaces = [box for box in unit if digit in values[box]]
-            if len(dplace) == 1:
+            if len(dplaces) == 1:
                 values[dplaces[0]] = digit
     return values
 
@@ -148,9 +180,9 @@ def search(values):
     if values is False:
         return False # The puzzle previously Failed
     if all(len(values[s]) == 1 for s in boxes):
-        return values #The puzzle is solved! ALL boxes have one values
+        return values #The puzzle is solved! ALL boxes have one value
 
-    #Now we must choose oneo fthe unfilled squares with the fewest possibilities
+    #Now we must choose one of the unfilled squares with the fewest possibilities
     #This will be our starting point for our search tree.
     n,s = min((len(values[s]), s) for s in boxes if len(values[s]) > 1)
     #Now use recurrence to solve each of the resulting sudokus
@@ -161,7 +193,7 @@ def search(values):
         if attempt:
             return attempt
 
-def solve(grid):
+def solve(grid, solving_diaganol = False):
     """
     Find the solution to a Sudoku grid.
     Args:
@@ -170,7 +202,13 @@ def solve(grid):
     Returns:
         The dictionary representation of the final sudoku grid. False if no solution exists.
     """
-    # TODO: solve
+    values = grid_values(grid)
+    puzzle_solved = search(values)
+    if puzzle_solved:
+        return puzzle_solved
+    else:
+        return False
+
 if __name__ == '__main__':
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
     display(solve(diag_sudoku_grid))
