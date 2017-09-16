@@ -28,10 +28,14 @@ def naked_twins(values):
     #Getting the potential twins, those boxes wtih two values
     candidates = [box for box in values.keys() if len(value[box]) == 2]
 
-
-    naked_twins = [[box1, box2] for box1 in potential_twins \
+    # from the candidates that have 2 values, run through each box
+    naked_twins = [[box1, box2] for box1 in potential_twins
+                        #and then that boxes' peers
                                 for box2 in peers[box1] \
+                                # and add that combination of B1,B2 if
+                                #the two boxes values are essentially equal!
                                 if set(values[box1]) == set(values[box2])]
+
 
     for i in range(len(naked_twins)):
         box1 = naked_twins[i][0]
@@ -42,7 +46,6 @@ def naked_twins(values):
         for peer_val in peers_int:
             if len(values[peer_val])>2:
                 for rm_val in values[box1]:
-                    #values[peer_val] = values[peer_val].replace(rm_val,'')
                     values = assign_value(values, peer_val, values[peer_val].replace(rm_val,''))
     return values
 
@@ -106,7 +109,7 @@ def only_choice(values):
     among a set of peers
     """
     for unit in unitlist:
-        for digit in '123456789'
+        for digit in '123456789':
             dplaces = [box for box in unit if digit in values[box]]
             if len(dplace) == 1:
                 values[dplaces[0]] = digit
