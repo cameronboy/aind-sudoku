@@ -8,6 +8,7 @@ def cross(A, B):
     "Cross product of elements in A and elements in B."
     return [s+t for s in A for t in B]
 
+
 def get_unitlist(solving_diaganol=False):
     if solving_diaganol:
         return row_units + column_units + square_units + diag_units
@@ -193,7 +194,7 @@ def search(values):
         if attempt:
             return attempt
 
-def solve(grid, solving_diaganol = False):
+def solve(grid):
     """
     Find the solution to a Sudoku grid.
     Args:
