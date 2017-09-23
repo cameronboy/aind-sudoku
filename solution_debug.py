@@ -1,6 +1,66 @@
 from solution import *
 
 
+<<<<<<< HEAD
+=======
+
+
+
+def naked_twins(values):
+    """Eliminate values using the naked twins strategy.
+    Args:
+        values(dict): a dictionary of the form {'box_name': '123456789', ...}
+
+    Returns:
+        the values dictionary with the naked twins eliminated from peers.
+    """
+    print('Before')
+    print(display(values))
+    #Getting the potential twins, those boxes wtih two values
+
+    candidates = [box for box in values.keys() if len(values[box]) == 2]
+    print('Candidates')
+    print(candidates)
+
+    # from the candidates that have 2 values, run through each box
+    naked_twins = [[box1, box2] for box1 in candidates
+                        #and then that boxes' peers
+                                for box2 in peers[box1] \
+                                # and add that combination of B1,B2 if
+                                #the two boxes values are essentially equal!
+                                if set(values[box1]) == set(values[box2])]
+
+    print('Naked Twins!')
+    print(naked_twins)
+
+    #For the naked_twins, run through each twin's peers
+    #and remove the twin's values from that peer
+    for i in range(len(naked_twins)):
+        #define our twins for easy reference
+        box1 = naked_twins[i][0]
+        box2 = naked_twins[i][1]
+        #Gather each twin's peers
+        peers1 = set(peers[box1])
+        peers2 = set(peers[box2])
+        peers_int = peers1 & peers2
+        #Run through all the peers
+        for peer_val in peers_int:
+            #by passing peers that are already solved
+            if len(values[peer_val]) > 2:
+                #run through the values for that peer
+                for rm_val in values[box1]:
+                    #"reassign"/remove the values from that peer that are contained
+                    #in the twin
+                    values = assign_value(values, peer_val, values[peer_val].replace(rm_val,''))
+    print('After')
+    print(display(values))
+    #return values
+
+
+naked_twins(tst)
+
+
+>>>>>>> e60fa61abf80c4764723d8f727bda086727fd944
 tst = dict({"G7": "2345678",
             "G6": "1236789",
             "G5": "23456789",
@@ -83,6 +143,7 @@ tst = dict({"G7": "2345678",
             "D3": "8",
             "D1": "36"
 })
+<<<<<<< HEAD
 
 
 print(display(naked_twins(tst)))
@@ -92,3 +153,5 @@ for rm_val in tst['D1']:
     print(rm_val)
 
 print(tst['A1'])
+=======
+>>>>>>> e60fa61abf80c4764723d8f727bda086727fd944
