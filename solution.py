@@ -46,6 +46,8 @@ def assign_value(values, box, value):
     return values
 
 def naked_twins(values):
+    print('before:')
+    print(display(values))
     """Eliminate values using the naked twins strategy.
     Args:
         values(dict): a dictionary of the form {'box_name': '123456789', ...}
@@ -57,6 +59,7 @@ def naked_twins(values):
     #Getting the potential twins, those boxes wtih two values
     candidates = [box for box in values.keys() if len(values[box]) == 2]
 
+    print('Candidates: {}'.format(candidates))
     # from the candidates that have 2 values, run through each box
     naked_twins = [[box1, box2] for box1 in candidates
                         #and then that boxes' peers
@@ -65,6 +68,7 @@ def naked_twins(values):
                                 #the two boxes values are essentially equal!
                                 if set(values[box1]) == set(values[box2])]
 
+    print('naked_twins: {}'.format(naked_twins))
     #For the naked_twins, run through each twin's peers
     #and remove the twin's values from that peer
     for i in range(len(naked_twins)):
@@ -74,16 +78,21 @@ def naked_twins(values):
         #Gather each twin's peers
         peers1 = set(peers[box1])
         peers2 = set(peers[box2])
-        peers_int = peers1 & peers2
+        unique_peers = peers1 & peers2
+        print('({},{}) Unique Peers: {}'.format(box1, box2, unique_peers))
         #Run through all the peers
-        for peer_val in peers_int:
+        for peer in unique_peers:
             #by passing peers that are already solved
-            if len(values[peer_val])>2:
+            if len(values[peer])>2:
                 #run through the values for that peer
                 for rm_val in values[box1]:
                     #"reassign"/remove the values from that peer that are contained
                     #in the twin
-                    values = assign_value(values, peer_val, values[peer_val].replace(rm_val,''))
+                    dig = rm_val
+                    values = assign_value(values, peer, values[peer].replace(dig,''))
+
+    print('---------------------------------------')
+    print('After')
     return values
 
 
@@ -210,15 +219,15 @@ def solve(grid):
     else:
         return False
 
-if __name__ == '__main__':
-    diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
-    display(solve(diag_sudoku_grid))
-
-    try:
-        from visualize import visualize_assignments
-        visualize_assignments(assignments)
-
-    except SystemExit:
-        pass
-    except:
-        print('We could not visualize your board due to a pygame issue. Not a problem! It is not a requirement.')
+# if __name__ == '__main__':
+#     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
+#     display(solve(diag_sudoku_grid))
+#
+#     try:
+#         from visualize import visualize_assignments
+#         visualize_assignments(assignments)
+#
+#     except SystemExit:
+#         pass
+#     except:
+#         print('We could not visualize your board due to a pygame issue. Not a problem! It is not a requirement.')
