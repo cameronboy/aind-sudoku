@@ -1,6 +1,8 @@
-
-
 # NEcessary OBjects
+from itertools import groupby
+
+
+
 
 assignments = []
 
@@ -8,12 +10,12 @@ def cross(A, B):
     "Cross product of elements in A and elements in B."
     return [s+t for s in A for t in B]
 
-
-def get_unitlist(solving_diaganol=False):
-    if solving_diaganol:
-        return row_units + column_units + square_units + diag_units
-    else:
-        return row_units + column_units + square_units
+#
+# def get_unitlist(solving_diaganol=False):
+#     if solving_diaganol:
+#         return row_units + column_units + square_units + diag_units
+#     else:
+#         return row_units + column_units + square_units
 
 
 rows = 'ABCDEFGHI'
@@ -25,7 +27,8 @@ row_units = [cross(r, cols) for r in rows]
 column_units = [cross(rows, c) for c in cols]
 square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
 diag_units = [[rows[i] + cols[i] for i in range(9)], [rows[::-1][i] + cols[i] for i in range(9)]]
-unitlist = get_unitlist(solving_diaganol=True)
+# unitlist = get_unitlist(solving_diaganol=False)
+unitlist = row_units + column_units + square_units + diag_units
 units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
 peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
 
@@ -45,9 +48,8 @@ def assign_value(values, box, value):
         assignments.append(values.copy())
     return values
 
+
 def naked_twins(values):
-    print('before:')
-    print(display(values))
     """Eliminate values using the naked twins strategy.
     Args:
         values(dict): a dictionary of the form {'box_name': '123456789', ...}
@@ -55,45 +57,35 @@ def naked_twins(values):
     Returns:
         the values dictionary with the naked twins eliminated from peers.
     """
-
-    #Getting the potential twins, those boxes wtih two values
-    candidates = [box for box in values.keys() if len(values[box]) == 2]
-
-    print('Candidates: {}'.format(candidates))
-    # from the candidates that have 2 values, run through each box
-    naked_twins = [[box1, box2] for box1 in candidates
-                        #and then that boxes' peers
-                                for box2 in peers[box1] \
-                                # and add that combination of B1,B2 if
-                                #the two boxes values are essentially equal!
-                                if set(values[box1]) == set(values[box2])]
-
-    print('naked_twins: {}'.format(naked_twins))
-    #For the naked_twins, run through each twin's peers
-    #and remove the twin's values from that peer
-    for i in range(len(naked_twins)):
-        #define our twins for easy reference
-        box1 = naked_twins[i][0]
-        box2 = naked_twins[i][1]
-        #Gather each twin's peers
-        peers1 = set(peers[box1])
-        peers2 = set(peers[box2])
-        unique_peers = peers1 & peers2
-        print('({},{}) Unique Peers: {}'.format(box1, box2, unique_peers))
-        #Run through all the peers
-        for peer in unique_peers:
-            #by passing peers that are already solved
-            if len(values[peer])>2:
-                #run through the values for that peer
-                for rm_val in values[box1]:
-                    #"reassign"/remove the values from that peer that are contained
-                    #in the twin
-                    dig = rm_val
-                    values = assign_value(values, peer, values[peer].replace(dig,''))
-
-    print('---------------------------------------')
-    print('After')
+    # print('Before')
+    # display(values)
+    # print('-----------------------------')
+    # First select boxes with 2 entries
+    potential_twins = [box for box in values.keys() if len(values[box]) == 2]
+    # Collect boxes that have the same elements
+    naked_twins = [[box1,box2] for box1 in potential_twins \
+                    for box2 in peers[box1] \
+                    if set(values[box1]) == set(values[box2]) ]
+    # print('Potential Twins: {}'.format(potential_twins))
+    # print('Naked Twins: {}'.format(naked_twins))
+    for twin_set in naked_twins:
+         box1 = twin_set[0]
+         box2 = twin_set[1]
+         peers1 = peers[box1]
+         peers2 = peers[box2]
+         peers_to_update = [peer for peer in peers1.intersection(peers2) if len(values[peer])>2]
+         digits = set(values[box1])
+        #  print('{} - {} to Remove from {} Peers: {}'.format(twin_set, digits, len(peers_to_update), peers_to_update))
+         for peer in peers_to_update:
+             for digit in digits:
+                #  print("peer {}:{} to have {} removed? {}'".format(peer,values[peer], digit, digit in values[peer]))
+                 values = assign_value(values, peer, values[peer].replace(digit,''))
+    # print('After')
+    # print('-----------------------------')
     return values
+
+
+
 
 
 def grid_values(grid):
@@ -218,8 +210,9 @@ def solve(grid):
         return puzzle_solved
     else:
         return False
-
+#
 # if __name__ == '__main__':
+#     import itertools
 #     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
 #     display(solve(diag_sudoku_grid))
 #
