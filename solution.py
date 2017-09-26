@@ -1,21 +1,16 @@
 # NEcessary OBjects
-from itertools import groupby
-
-
-
-
 assignments = []
 
 def cross(A, B):
     "Cross product of elements in A and elements in B."
     return [s+t for s in A for t in B]
 
-#
-# def get_unitlist(solving_diaganol=False):
-#     if solving_diaganol:
-#         return row_units + column_units + square_units + diag_units
-#     else:
-#         return row_units + column_units + square_units
+
+ def get_unitlist(solving_diaganol=False):
+     if solving_diaganol:
+         return row_units + column_units + square_units + diag_units
+     else:
+         return row_units + column_units + square_units
 
 
 rows = 'ABCDEFGHI'
@@ -27,8 +22,7 @@ row_units = [cross(r, cols) for r in rows]
 column_units = [cross(rows, c) for c in cols]
 square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
 diag_units = [[rows[i] + cols[i] for i in range(9)], [rows[::-1][i] + cols[i] for i in range(9)]]
-# unitlist = get_unitlist(solving_diaganol=False)
-unitlist = row_units + column_units + square_units + diag_units
+unitlist = get_unitlist(solving_diaganol=False)
 units = dict((s, [u for u in unitlist if s in u]) for s in boxes)
 peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes)
 
@@ -210,17 +204,17 @@ def solve(grid):
         return puzzle_solved
     else:
         return False
-#
-# if __name__ == '__main__':
-#     import itertools
-#     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
-#     display(solve(diag_sudoku_grid))
-#
-#     try:
-#         from visualize import visualize_assignments
-#         visualize_assignments(assignments)
-#
-#     except SystemExit:
-#         pass
-#     except:
-#         print('We could not visualize your board due to a pygame issue. Not a problem! It is not a requirement.')
+
+ if __name__ == '__main__':
+     import itertools
+     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
+     display(solve(diag_sudoku_grid))
+        
+     try:
+         from visualize import visualize_assignments
+         visualize_assignments(assignments)
+
+     except SystemExit:
+         pass
+     except:
+         print('We could not visualize your board due to a pygame issue. Not a problem! It is not a requirement.')
