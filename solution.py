@@ -58,33 +58,30 @@ def naked_twins(values):
     Returns:
         the values dictionary with the naked twins eliminated from peers.
     """
-    # disp = values.copy()
-    # print('Before')
-    # display(disp)
-    # print('-----------------------------')
     # First select boxes with 2 entries
     potential_twins = [box for box in values.keys() if len(values[box]) == 2]
+
     # Collect boxes that have the same elements
     naked_twins = [[box1, box2]
                    for box1 in potential_twins for box2 in peers[box1]
                    if set(values[box1]) == set(values[box2])]
-    # print('Potential Twins: {}'.format(potential_twins))
-    # print('Naked Twins: {}'.format(naked_twins))
+    # Now we have our Naked_twins, we need to loop through them
     for twin_set in naked_twins:
+        # Gather the individual twins and fetch their peers
         box1 = twin_set[0]
         box2 = twin_set[1]
         peers1 = peers[box1]
         peers2 = peers[box2]
+        # Now that we have their peers, let's grab their shared peers
         tot_peers = peers1.intersection(peers2) & peers2.intersection(peers1)
+        # and define a list of peers we want to remove values from
         peers_to_update = [peer for peer in tot_peers if len(values[peer]) >= 2]
+        # Let's loop through the twins' shared two digits
         digits = set(values[box1])
-        # print('{} - {} to Remove from {} Peers: {}'.format(twin_set, digits, len(peers_to_update), sorted(peers_to_update)))
+        # and replace them with nothing!
         for peer in peers_to_update:
             for digit in digits:
-                # print("peer {}:{} to have {} removed? {}'".format(peer, values[peer], digit, digit in values[peer]))
                 values = assign_value(values, peer, values[peer].replace(digit, ''))
-    # print('After')
-    # print('-----------------------------')
     return values
 
 
