@@ -75,13 +75,16 @@ def naked_twins(values):
         # Now that we have their peers, let's grab their shared peers
         tot_peers = peers1.intersection(peers2) & peers2.intersection(peers1)
         # and define a list of peers we want to remove values from
-        peers_to_update = [peer for peer in tot_peers if len(values[peer]) >= 2]
+        peers_to_update = [
+            peer for peer in tot_peers if len(values[peer]) >= 2
+        ]
         # Let's loop through the twins' shared two digits
         digits = set(values[box1])
         # and replace them with nothing!
         for peer in peers_to_update:
             for digit in digits:
-                values = assign_value(values, peer, values[peer].replace(digit, ''))
+                values = assign_value(values, peer, values[peer].replace(
+                    digit, ''))
     return values
 
 
@@ -226,4 +229,6 @@ if __name__ == '__main__':
     except SystemExit:
         pass
     except:
-        print('We could not visualize your board due to a pygame issue. Not a problem! It is not a requirement.')
+        print(
+            'We could not visualize your board due to a pygame issue. Not a problem! It is not a requirement.'
+        )
